@@ -1,0 +1,123 @@
+# ✅ 1. Apex REST Class
+
+**AccountManagerCopy.cls**
+
+```apex
+@RestResource(urlMapping='/Accounts/*/contacts')
+global with sharing class AccountManagerCopy {
+
+    @HttpGet
+    global static Account getAccount() {
+        RestRequest req = RestContext.request;
+
+        // Extract Account Id from URL
+        String uri = req.requestURI;
+        String accountId = uri.substring(
+            uri.lastIndexOf('/Accounts/') + 10,
+            uri.lastIndexOf('/contacts')
+        );
+
+        // Query Account + Contacts
+        Account acc = [
+            SELECT Id, Name,
+                   (SELECT Id, Name FROM Contacts)
+            FROM Account
+            WHERE Id = :accountId
+            LIMIT 1
+        ];
+
+        return acc;
+    }
+}
+```
+
+---
+
+# ✅ 2. Test Class
+
+**AccountManagerTestCopy.cls**
+
+```apex
+@IsTest
+private class AccountManagerTestCopy {
+
+    @IsTest
+    static void testGetAccount() {
+        // Create test data
+        Account acc = new Account(Name = 'Test Account');
+        insert acc;
+
+        Contact con1 = new Contact(FirstName='A', LastName='One', AccountId=acc.Id);
+        Contact con2 = new Contact(FirstName='B', LastName='Two', AccountId=acc.Id);
+        insert new List<Contact>{con1, con2};
+
+        // Mock REST request
+        RestRequest req = new RestRequest();
+        req.requestURI = '/services/apexrest/Accounts/' + acc.Id + '/contacts';
+        req.httpMethod = 'GET';
+
+        RestContext.request = req;
+
+        // Call method
+        Account result = AccountManagerCopy.getAccount();
+
+        // Assertions
+        System.assertNotEquals(null, result);
+        System.assertEquals(acc.Id, result.Id);
+        System.assertEquals('Test Account', result.Name);
+        System.assertEquals(2, result.Contacts.size());
+    }
+}
+```
+
+---
+
+# 🎯 Key points để bạn nhớ (rất hay ra thi / interview)
+
+### 1. REST mapping
+
+```apex
+@RestResource(urlMapping='/Accounts/*/contacts')
+```
+
+→ Endpoint:
+
+```
+/services/apexrest/Accounts/{Id}/contacts
+```
+
+---
+
+### 2. Lấy param từ URL
+
+```apex
+req.requestURI
+```
+
+→ parse bằng `substring`
+
+---
+
+### 3. Query relationship
+
+```apex
+(SELECT Id, Name FROM Contacts)
+```
+
+---
+
+### 4. Test REST
+
+```apex
+RestContext.request = req;
+```
+
+---
+
+### 5. Coverage 100%
+
+* Có test
+* Có assert
+* Có data (Account + Contact)
+
+---
