@@ -1,0 +1,59 @@
+## 🔥 INPUT CHO AI (ULTRA SHORT)
+
+### Create Remote Site Settings
+
+#### 1. HTTP
+
+* Name: `animals_http`
+* URL:
+
+```txt id="b91bnl"
+https://th-apex-http-callout.herokuapp.com
+```
+
+* Description:
+
+```txt id="p3p8bt"
+Trailhead animal service: HTTP
+```
+
+---
+
+#### 2. SOAP
+
+* Name: `animals_soap`
+* URL:
+
+```txt id="yl34yj"
+https://th-apex-soap-service.herokuapp.com
+```
+
+* Description:
+
+```txt id="i0ww6c"
+Trailhead animal service: SOAP
+```
+
+---
+
+## ⚡ Metadata XML (deploy được luôn)
+
+```xml id="lxyumc"
+<RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>animals_http</fullName>
+    <description>Trailhead animal service: HTTP</description>
+    <disableProtocolSecurity>false</disableProtocolSecurity>
+    <isActive>true</isActive>
+    <url>https://th-apex-http-callout.herokuapp.com</url>
+</RemoteSiteSetting>
+```
+
+```xml id="h7slx1"
+<RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>animals_soap</fullName>
+    <description>Trailhead animal service: SOAP</description>
+    <disableProtocolSecurity>false</disableProtocolSecurity>
+    <isActive>true</isActive>
+    <url>https://th-apex-soap-service.herokuapp.com</url>
+</RemoteSiteSetting>
+```

@@ -1,0 +1,176 @@
+## 1. Custom Metadata Type (Support Tier)
+
+**Support_Tier__mdt.object-meta.xml**
+
+```xml
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Support Tier</label>
+    <pluralLabel>Support Tiers</pluralLabel>
+    <nameField>
+        <type>Text</type>
+        <label>Support Tier Name</label>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <visibility>Public</visibility>
+</CustomObject>
+```
+
+**Field: Minimum Spending**
+
+```xml
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minimum_Spending__c</fullName>
+    <label>Minimum Spending</label>
+    <type>Currency</type>
+    <precision>18</precision>
+    <scale>2</scale>
+</CustomField>
+```
+
+---
+
+## 2. Custom Metadata Records
+
+**Bronze.md-meta.xml**
+
+```xml
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bronze</label>
+    <values>
+        <field>Minimum_Spending__c</field>
+        <value xsi:type="xsd:double">0</value>
+    </values>
+</CustomMetadata>
+```
+
+**Silver.md-meta.xml**
+
+```xml
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Silver</label>
+    <values>
+        <field>Minimum_Spending__c</field>
+        <value xsi:type="xsd:double">5000</value>
+    </values>
+</CustomMetadata>
+```
+
+**Gold.md-meta.xml**
+
+```xml
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Gold</label>
+    <values>
+        <field>Minimum_Spending__c</field>
+        <value xsi:type="xsd:double">10000</value>
+    </values>
+</CustomMetadata>
+```
+
+---
+
+## 3. Account Fields
+
+### 3.1 Support Tier Picklist
+
+```xml
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Support_Tier__c</fullName>
+    <label>Support Tier</label>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <value><fullName>Bronze</fullName><default>true</default></value>
+            <value><fullName>Silver</fullName></value>
+            <value><fullName>Gold</fullName></value>
+        </valueSetDefinition>
+    </valueSet>
+    <required>true</required>
+    <defaultValue>$CustomMetadata.Support_Tier__mdt.Bronze.MasterLabel</defaultValue>
+</CustomField>
+```
+
+---
+
+### 3.2 Total Spending (Rollup)
+
+```xml
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Spending__c</fullName>
+    <label>Total Spending</label>
+    <type>Summary</type>
+    <summarizedObject>Opportunity</summarizedObject>
+    <summaryOperation>Sum</summaryOperation>
+    <summaryForeignKey>AccountId</summaryForeignKey>
+    <summaryField>Amount</summaryField>
+</CustomField>
+```
+
+---
+
+### 3.3 Formula Field (Amount Until Next Tier)
+
+```xml
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Amount_Until_Next_Tier__c</fullName>
+    <label>Amount Until Next Tier</label>
+    <type>Currency</type>
+    <precision>18</precision>
+    <scale>2</scale>
+    <formula>
+IF(
+ Total_Spending__c < $CustomMetadata.Support_Tier__mdt.Bronze.Minimum_Spending__c,
+ $CustomMetadata.Support_Tier__mdt.Bronze.Minimum_Spending__c - Total_Spending__c,
+ IF(
+  Total_Spending__c < $CustomMetadata.Support_Tier__mdt.Silver.Minimum_Spending__c,
+  $CustomMetadata.Support_Tier__mdt.Silver.Minimum_Spending__c - Total_Spending__c,
+  IF(
+   Total_Spending__c < $CustomMetadata.Support_Tier__mdt.Gold.Minimum_Spending__c,
+   $CustomMetadata.Support_Tier__mdt.Gold.Minimum_Spending__c - Total_Spending__c,
+   0
+  )
+ )
+)
+    </formula>
+</CustomField>
+```
+
+---
+
+## 4. Validation Rule (Trailhead requirement)
+
+**Revenue_Validation.validationRule-meta.xml**
+
+```xml
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Revenue_Validation</fullName>
+    <active>true</active>
+    <errorConditionFormula>
+ISPICKVAL(Support_Tier__c, "Gold") &&
+AnnualRevenue &lt; 20 * $CustomMetadata.Support_Tier__mdt.Gold.Minimum_Spending__c
+    </errorConditionFormula>
+    <errorMessage>
+Annual revenue is less than 20 times the minimum spending amount of the Gold support tier
+    </errorMessage>
+</ValidationRule>
+```
+
+---
+
+## ✅ Tóm tắt cực ngắn (để feed AI)
+
+* Create CMDT: `Support_Tier__mdt` + field `Minimum_Spending__c`
+* Records: Bronze(0), Silver(5000), Gold(10000)
+* Account:
+
+  * Picklist `Support_Tier__c` (default Bronze via CMDT)
+  * Rollup `Total_Spending__c`
+  * Formula `Amount_Until_Next_Tier__c`
+* Validation Rule:
+
+```txt
+ISPICKVAL(Support_Tier__c, "Gold") &&
+AnnualRevenue < 20 * $CustomMetadata.Support_Tier__mdt.Gold.Minimum_Spending__c
+```
+
+---

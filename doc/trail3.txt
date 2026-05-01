@@ -1,0 +1,91 @@
+
+
+## 🔥 INPUT CHO AI (ULTRA SHORT - PLATFORM EVENT)
+
+### 1. Create Platform Event
+
+* Label: `Order Event`
+* Object Name: `Order_Event`
+* API: `Order_Event__e`
+* Plural: `Order Events`
+* Publish Behavior: `PublishImmediately`
+* Description: `Information about a customer order`
+
+---
+
+### 2. Fields
+
+#### Field 1
+
+* Label: `Order Number`
+* API: `Order_Number__c`
+* Type: `Text(10)`
+
+#### Field 2
+
+* Label: `Has Shipped`
+* API: `Has_Shipped__c`
+* Type: `Checkbox`
+
+---
+
+## ⚡ XML METADATA (copy là deploy được)
+
+### Platform Event
+
+```xml id="3rjoxu"
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Order Event</label>
+    <pluralLabel>Order Events</pluralLabel>
+    <nameField>
+        <type>Text</type>
+        <label>Order Event Name</label>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <eventType>HighVolume</eventType>
+    <publishBehavior>PublishImmediately</publishBehavior>
+    <description>Information about a customer order</description>
+</CustomObject>
+```
+
+---
+
+### Field: Order Number
+
+```xml id="sokbfb"
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Order_Number__c</fullName>
+    <label>Order Number</label>
+    <type>Text</type>
+    <length>10</length>
+</CustomField>
+```
+
+---
+
+### Field: Has Shipped
+
+```xml id="4q7h8f"
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Has_Shipped__c</fullName>
+    <label>Has Shipped</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+</CustomField>
+```
+
+---
+
+## 🧠 (Optional test - Apex publish)
+
+Paste vào Execute Anonymous:
+
+```apex id="a0n4b8"
+Order_Event__e evt = new Order_Event__e(
+    Order_Number__c = 'ORD001',
+    Has_Shipped__c = true
+);
+EventBus.publish(evt);
+```
+
+---

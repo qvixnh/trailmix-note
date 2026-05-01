@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minimum_Spending</fullName>
+    <active>true</active>
+    <errorConditionFormula>IF(
+ (ISPICKVAL(Support_Tier__c,"Silver") &amp;&amp;
+  Total_Spending__c &lt; $CustomMetadata.Support_Tier__mdt.Silver.Minimum_Spending__c)
+ ||
+ (ISPICKVAL(Support_Tier__c,"Gold") &amp;&amp;
+  Total_Spending__c &lt; $CustomMetadata.Support_Tier__mdt.Gold.Minimum_Spending__c),
+ TRUE,
+ FALSE
+)</errorConditionFormula>
+    <errorMessage>Total spending does not meet the minimum spending requirement for the selected support tier.</errorMessage>
+</ValidationRule>

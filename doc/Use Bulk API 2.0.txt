@@ -1,0 +1,130 @@
+## 🔥 INPUT CHO AI (ULTRA SHORT - BULK API 2.0)
+
+### 1. Create Job
+
+**POST**
+
+```
+/services/data/vXX.X/jobs/ingest
+```
+
+**Body**
+
+```json
+{
+  "operation": "insert",
+  "object": "Account",
+  "contentType": "CSV",
+  "lineEnding": "CRLF"
+}
+```
+
+---
+
+### 2. Upload CSV Data
+
+**PUT**
+
+```
+/services/data/vXX.X/jobs/ingest/{jobId}/batches
+```
+
+**Headers**
+
+```
+Content-Type: text/csv
+```
+
+**Body**
+
+```csv
+Name
+Bulk Test 1
+Bulk Test 2
+Bulk Test 3
+Bulk Test 4
+```
+
+---
+
+### 3. Close Job
+
+**PATCH**
+
+```
+/services/data/vXX.X/jobs/ingest/{jobId}
+```
+
+**Body**
+
+```json
+{
+  "state": "UploadComplete"
+}
+```
+
+---
+
+### 4. Check Status
+
+**GET**
+
+```
+/services/data/vXX.X/jobs/ingest/{jobId}
+```
+
+👉 wait until:
+
+```
+"state": "JobComplete"
+```
+
+---
+
+### 5. Get Success Records
+
+**GET**
+
+```
+/services/data/vXX.X/jobs/ingest/{jobId}/successfulResults
+```
+
+---
+
+### 6. (Optional) Get Failed Records
+
+**GET**
+
+```
+/services/data/vXX.X/jobs/ingest/{jobId}/failedResults
+```
+
+---
+
+## ⚡ CSV chuẩn để pass Trailhead
+
+File: `bulkv2hocdata.csv`
+
+```csv
+Name
+Global Treasures & Mapping Company
+Ahab’s Mighty Masts
+Planks R Us
+Cap’n Cook’s Kitchen Supplies
+```
+
+---
+
+## ⚠️ lỗi hay gặp (fix nhanh)
+
+* ❌ 400 → sai `Content-Type` → phải là `text/csv`
+* ❌ job stuck → quên PATCH `UploadComplete`
+* ❌ empty result → chưa `JobComplete`
+* ❌ CSV lỗi → sai lineEnding (Windows = CRLF)
+
+---
+
+## ✅ Done = pass challenge
+
+Chỉ cần insert thành công 4 records Account là đủ.
+
