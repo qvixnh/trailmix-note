@@ -1,0 +1,95 @@
+Dưới đây là **đáp án chuẩn để pass Hands-on Challenge (LWC accountFinder)** 👇
+(ngắn gọn + đúng yêu cầu 100%)
+
+---
+
+# ✅ 1. accountFinder.html
+
+```html
+<template>
+    <lightning-card>
+        <lightning-input
+            type="number"
+            label="Annual Revenue"
+            formatter="currency"
+            value={annualRevenue}
+            onchange={handleChange}>
+        </lightning-input>
+
+        <lightning-button
+            label="Reset"
+            onclick={reset}>
+        </lightning-button>
+    </lightning-card>
+</template>
+```
+
+---
+
+# ✅ 2. accountFinder.js
+
+```javascript
+import { LightningElement } from 'lwc';
+
+export default class AccountFinder extends LightningElement {
+    annualRevenue = null;
+
+    handleChange(event) {
+        this.annualRevenue = event.detail.value;
+    }
+
+    reset() {
+        this.annualRevenue = null;
+    }
+}
+```
+
+---
+
+# ✅ 3. accountFinder.js-meta.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
+</LightningComponentBundle>
+```
+
+---
+
+# 🎯 Checklist để không fail challenge
+
+* ✅ Component name: **accountFinder**
+* ✅ Property: `annualRevenue = null`
+* ✅ `formatter="currency"` (rất hay quên ❗)
+* ✅ `onchange={handleChange}`
+* ✅ `onclick={reset}`
+* ✅ Reset set lại `null`
+* ✅ Deploy + add vào **LWC Visualforce Devs page**
+
+---
+
+# ⚡ Giải thích nhanh (rất quan trọng để hiểu bản chất)
+
+### Visualforce vs LWC
+
+| Visualforce     | LWC             |
+| --------------- | --------------- |
+| Server rerender | Client rerender |
+| Apex controller | JavaScript      |
+| action method   | event handler   |
+
+---
+
+### Flow hoạt động
+
+1. User nhập input
+2. `handleChange` chạy → update `annualRevenue`
+3. LWC auto rerender UI
+4. Click Reset → `annualRevenue = null`
+5. UI clear ngay (không call server)
+
