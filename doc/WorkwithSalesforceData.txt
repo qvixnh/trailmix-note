@@ -1,0 +1,116 @@
+OK, phần này là **Hands-on Challenge tiếp theo**, mình tóm lại + đưa luôn code chuẩn để bạn paste deploy nhanh (giống cách bạn đang làm 👍).
+
+---
+
+# 🔥 1. Apex – thêm method mới
+
+Trong class **`AccountListControllerLwc`**, thêm method này:
+
+```apex
+@AuraEnabled(cacheable=true)
+public static List<Account> queryAccountsByRevenue(Decimal annualRevenue) {
+    return [
+        SELECT Id, Name
+        FROM Account
+        WHERE AnnualRevenue >= :annualRevenue
+    ];
+}
+```
+
+👉 Lưu ý:
+
+* `@AuraEnabled(cacheable=true)` → bắt buộc để dùng với `@wire`
+* `Decimal` đúng type theo đề
+* Query phải có `Id` + `Name`
+
+---
+
+# ⚡ 2. accountFinder.js
+
+Update file JS:
+
+```javascript
+import { LightningElement, wire } from 'lwc';
+import queryAccountsByRevenue from '@salesforce/apex/AccountListControllerLwc.queryAccountsByRevenue';
+
+export default class AccountFinder extends LightningElement {
+    annualRevenue = null;
+
+    handleChange(event) {
+        this.annualRevenue = event.detail.value;
+    }
+
+    reset() {
+        this.annualRevenue = null;
+    }
+
+    @wire(queryAccountsByRevenue, { annualRevenue: '$annualRevenue' })
+    accounts;
+}
+```
+
+👉 Key points:
+
+* `$annualRevenue` → reactive variable (rất hay bị quên ❗)
+* Không cần gọi Apex thủ công → dùng `@wire`
+
+---
+
+# 🧩 3. accountFinder.html
+
+```html
+<template>
+    <lightning-card>
+        <lightning-input
+            type="number"
+            label="Annual Revenue"
+            formatter="currency"
+            value={annualRevenue}
+            onchange={handleChange}>
+        </lightning-input>
+
+        <lightning-button
+            label="Reset"
+            onclick={reset}>
+        </lightning-button>
+
+        <template lwc:if={accounts.data}>
+            <template for:each={accounts.data} for:item="account">
+                <p key={account.Id}>{account.Name}</p>
+            </template>
+        </template>
+    </lightning-card>
+</template>
+```
+
+---
+
+# 🚀 4. Deploy + Test
+
+### Deploy:
+
+* Deploy Apex class
+* Deploy `accountFinder`
+
+### Test:
+
+1. Vào **LWC Visualforce Devs page**
+2. Nhập số tiền (VD: 1000000)
+3. → List Account sẽ auto update
+
+---
+
+# ⚠️ Lỗi hay gặp (check nhanh nếu fail)
+
+* ❌ Quên `$` trong `@wire`
+* ❌ Sai tên method `queryAccountsByRevenue`
+* ❌ Sai type `Decimal`
+* ❌ Không deploy Apex trước
+* ❌ Không add component vào page
+
+---
+
+Nếu bạn muốn, mình có thể:
+
+* Viết luôn **full metadata XML cho accountFinder**
+* Hoặc giúp bạn build luôn version có **search + debounce + loading spinner (chuẩn production)** 😏
