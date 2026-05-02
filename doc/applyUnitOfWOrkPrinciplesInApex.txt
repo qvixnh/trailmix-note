@@ -1,0 +1,5 @@
+Write a Test Method using the Unit of Work
+The test class must be named UnitOfWorkTest with a test method named challengeComplete. Call the commitWork method to update the database. Run the test at least once before attempting the challenge. It must pass successfully with the following assertions:
+System.assertEquals(100, [Select Id from Account].size());
+System.assertEquals(500, [Select Id from Contact].size());
+System.assertEquals(500, [Select Id from Note].size());
