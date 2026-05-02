@@ -1,0 +1,71 @@
+
+
+# 🎯 ❌ Vấn đề
+
+Trong `display.js`:
+
+```javascript
+this.augmentor = event.target.value;
+```
+
+👉 `event.target.value` luôn là **string**
+→ nên `"2" + 2 = "22"` (bị nối chuỗi)
+
+---
+
+# ✅ ✅ Fix đúng (cái Trailhead muốn)
+
+## 🔧 Sửa trong function:
+
+```javascript
+handleAugmentorChange(event) {
+    this.augmentor = parseInt(event.target.value, 10);
+}
+```
+
+---
+
+# 💡 Giải thích nhanh (quan trọng để nhớ)
+
+| Value                | Type         |
+| -------------------- | ------------ |
+| `event.target.value` | string `"2"` |
+| `parseInt(...)`      | number `2`   |
+
+👉 Sau khi fix:
+
+```javascript
+2 + 2 = 4 ✅
+```
+
+---
+
+# 🚀 Alternative (cũng đúng nhưng Trailhead thích parseInt hơn)
+
+```javascript
+this.augmentor = Number(event.target.value);
+```
+
+hoặc
+
+```javascript
+this.augmentor = +event.target.value;
+```
+
+---
+
+
+
+```javascript
+input.value  // luôn là string ❗
+```
+
+→ Khi làm LWC:
+
+* Luôn cast:
+
+```javascript
+Number(...)
+parseInt(...)
+parseFloat(...)
+```
