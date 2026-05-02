@@ -1,0 +1,53 @@
+# ✅ 1. Domain class: `AccountsCopy.cls`
+
+```apex
+public with sharing class AccountsCopy extends fflib_SObjectDomain {
+
+    // Constructor
+    public AccountsCopy(List<Account> sObjectList) {
+        super(sObjectList);
+    }
+
+    // Factory
+    public class Constructor implements fflib_SObjectDomain.IConstructable {
+        public fflib_SObjectDomain construct(List<SObject> sObjectList) {
+            return new AccountsCopy((List<Account>) sObjectList);
+        }
+    }
+
+    // BEFORE INSERT
+    public override void onBeforeInsert() {
+        for (Account acc : (List<Account>) Records) {
+            acc.Description = 'Domain classes rock!';
+        }
+    }
+
+    // BEFORE UPDATE
+    public override void onBeforeUpdate(Map<Id, SObject> existingRecords) {
+        for (Account acc : (List<Account>) Records) {
+            String target = 'Domain classes rock!';
+            String current = acc.Description;
+
+            if (current != null) {
+                Integer distance = target.getLevenshteinDistance(current);
+                acc.AnnualRevenue = distance;
+            }
+        }
+    }
+}
+```
+
+---
+
+# ✅ 2. Trigger: `AccountsTriggerCopy.trigger`
+
+```apex
+trigger AccountsTriggerCopy on Account (
+    before insert, before update,
+    after insert, after update,
+    before delete, after delete, after undelete
+) {
+    fflib_SObjectDomain.triggerHandler(AccountsCopy.class);
+}
+```
+
