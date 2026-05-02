@@ -1,0 +1,65 @@
+
+---
+
+# ✅ 1. Service class: `CaseService`
+
+```apex
+public with sharing class CaseService {
+
+    public static void closeCases(Set<Id> caseIds, String reason) {
+
+        // Validate
+        if (caseIds == null || caseIds.isEmpty()) {
+            throw new CaseServiceException('Case IDs not provided');
+        }
+
+        if (String.isBlank(reason)) {
+            throw new CaseServiceException('Close reason is required');
+        }
+
+        // Query cases
+        List<Case> casesToUpdate = [
+            SELECT Id, Status, Reason
+            FROM Case
+            WHERE Id IN :caseIds
+        ];
+
+        // Update
+        for (Case c : casesToUpdate) {
+            c.Status = 'Closed';
+            c.Reason = reason;
+        }
+
+        update casesToUpdate;
+    }
+
+    public class CaseServiceException extends Exception {}
+}
+```
+
+---
+
+# ✅ 2. REST class: `CaseCloseResource`
+
+```apex
+@RestResource(urlMapping='/case/*/close')
+global with sharing class CaseCloseResource {
+
+    @HttpPost
+    global static void closeCase(String reason) {
+
+        RestRequest req = RestContext.request;
+
+        // Parse Id từ URL: /case/{Id}/close
+        String[] parts = req.requestURI.split('/');
+        Id caseId = parts[2];
+
+        // Call service
+        CaseService.closeCases(
+            new Set<Id>{ caseId },
+            reason
+        );
+    }
+}
+```
+

@@ -1,0 +1,31 @@
+public with sharing class CaseService {
+
+    public static void closeCases(Set<Id> caseIds, String reason) {
+
+        // Validate
+        if (caseIds == null || caseIds.isEmpty()) {
+            throw new CaseServiceException('Case IDs not provided');
+        }
+
+        if (String.isBlank(reason)) {
+            throw new CaseServiceException('Close reason is required');
+        }
+
+        // Query cases
+        List<Case> casesToUpdate = [
+            SELECT Id, Status, Reason
+            FROM Case
+            WHERE Id IN :caseIds
+        ];
+
+        // Update
+        for (Case c : casesToUpdate) {
+            c.Status = 'Closed';
+            c.Reason = reason;
+        }
+
+        update casesToUpdate;
+    }
+
+    public class CaseServiceException extends Exception {}
+}
